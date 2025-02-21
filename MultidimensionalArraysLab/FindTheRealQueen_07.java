@@ -58,8 +58,10 @@ public class FindTheRealQueen_07 {
             for (int j = col + 1; j < matrix[row].length - 1; j++) {
                 row++;
                 col++;
-                if(matrix[i][i].equals("q")) {
-                    return false;
+                if (i == j) {
+                    if (matrix[i][j].equals("q")) {
+                        return false;
+                    }
                 }
             }
         }
