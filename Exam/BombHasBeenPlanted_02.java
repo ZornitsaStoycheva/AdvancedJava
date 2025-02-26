@@ -1,121 +1,130 @@
 package Exam;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class BombHasBeenPlanted_02 {
-
-    public static int startRow;
-    public static int startCol;
-    public static boolean isBomb = false;
-    public static boolean isFoundT = false;
-    public static int time = 16;
+    
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        int[] arr = Arrays.stream(scanner.nextLine().split(",\\s+"))
-                .mapToInt(Integer::parseInt)
-                .toArray();
+        List<Integer> sizeElements = Arrays.stream(scanner.nextLine().split(", "))
+                .map(Integer::parseInt)
+                .toList();
+        int n = sizeElements.get(0);
+        int m = sizeElements.get(1);
 
-        int row = arr[0];
-        int col = arr[1];
+        char[][] matrix = fillMatrix(n, m, scanner);
 
-        char[][] matrix = new char[row][col];
+        int seconds = 16;
 
-        for (int i = 0; i < row; i++) {
-            String matrixToCharArray = scanner.nextLine();
-            matrix[i] = matrixToCharArray.toCharArray();
+        int row = getRow(matrix, 'C');
+        int col = getRowCol(matrix, 'C');
+
+        playBombHasBeenPlanted(scanner, matrix, row, col, seconds);
+
+        printBombHasBeenPlanted(matrix);
+    }
+
+    private static char[][] fillMatrix(int n, int m, Scanner scanner) {
+        char[][] matrix = new char[n][];
+        for (int i = 0; i < n; i++) {
+            char[] input = scanner.nextLine().toCharArray();
+            matrix[i] = input;
         }
+        return matrix;
+    }
 
-        for (int rows = 0; rows < matrix.length; rows++) {
-            for (int cols = 0; cols < matrix[rows].length; cols++) {
-                if (matrix[rows][cols] == 'C') {
-                    startRow = rows;
-                    startCol = cols;
+    private static int getRow(char[][] matrix, char symbol) {
+        int row = 0;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] == symbol) {
+                    row = i;
                 }
             }
         }
-
-        String input = scanner.nextLine();
-
-
-        while (time > 0 && !isBomb && !isFoundT) {
-
-            String command = null;
-            switch (input) {
-                case "up":
-                    command = scanner.nextLine();
-                    moveCounterStroke(matrix, -1, 0, command);
-                    break;
-                case "down":
-                    command = scanner.nextLine();
-                    moveCounterStroke(matrix, +1, 0, command);
-                    break;
-                case "right":
-                    command = scanner.nextLine();
-                    moveCounterStroke(matrix, 0, +1, command);
-                    break;
-                case "left":
-                    command = scanner.nextLine();
-                    moveCounterStroke(matrix, 0, -1, command);
-                    break;
-            }
-
-            input = command;
-
-        }
-        printMatrix(matrix);
-
+        return row;
     }
 
-    private static void moveCounterStroke (char[][] matrix, int row, int col, String command) {
-        int nextRow = startRow + row;
-        int nextCol = startCol + col;
-
-        if (isValid(matrix, nextRow, nextCol)) {
-
-            if (matrix[nextRow][nextCol] == '*') {
-                matrix[startRow][startCol] = '*';
-                matrix[nextRow][nextCol] = 'C';
-                startRow = nextRow;
-                startCol = nextCol;
-                time --;
-            } else if (matrix[nextRow][nextCol] == 'T') {
-                matrix[startRow][startCol] = '*';
-                matrix[nextRow][nextCol] = 'C';
-                time --;
-                isFoundT = true;
-            } else if (matrix[nextRow][nextCol] == 'B') {
-
-                if (command.equals("defuse")) {
-                    time -= 4;
-                    matrix[nextRow][nextCol] = 'D';
-                    isBomb = true;
-                    matrix[startRow][startCol] = 'C';
-                } else {
-                    time -= 2;
-                    isBomb = true;
+    private static int getRowCol(char[][] matrix, char symbol) {
+        int col = 0;
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                if (matrix[i][j] == symbol) {
+                    col = j;
                 }
+            }
+        }
+        return col;
+    }
 
-
-                if (time <= 0) {
-                    matrix[nextRow][nextCol] = 'X';
+    private static void playBombHasBeenPlanted(Scanner scanner, char[][] matrix, int row, int col, int seconds) {
+        boolean isDead = false;
+        boolean isWin = false;
+        label:
+        while (seconds > 0) {
+            seconds--;
+            String command = scanner.nextLine();
+            int oldRow = row;
+            int oldCol = col;
+            switch (command) {
+                case "up" -> row--;
+                case "down" -> row++;
+                case "left" -> col--;
+                case "right" -> col++;
+                case "defuse" -> {
+                    char position = matrix[row][col];
+                    if (position == 'B') {
+                        seconds -= 3;
+                        if (seconds >= 0) {
+                            matrix[row][col] = 'D';
+                            isWin = true;
+                        }
+                        break label;
+                    } else {
+                        seconds--;
+                    }
                 }
-                //matrix[startRow][startCol] = 'C';
+            }
+            if (row < 0 || row > matrix[0].length - 1 || col < 0 || col > matrix[0].length - 1) {
+                row = oldRow;
+                col = oldCol;
+            }
+            char position = matrix[row][col];
+            if (position == 'T') {
+                matrix[row][col] = '*';
+                isDead = true;
+                break;
+            }
+        }
+
+        if (isDead) {
+            System.out.printf("Terrorists win!%n");
+        } else {
+            if (isWin) {
+                System.out.printf("Counter-terrorist wins!%n");
+                System.out.printf("Bomb has been defused: %d second/s remaining.%n", seconds);
+            } else {
+                if (seconds < 0) {
+                    matrix[row][col] = 'X';
+                }
+                System.out.printf("Terrorists win!%n");
+                System.out.printf("Bomb was not defused successfully!%n");
+                System.out.printf("Time needed: %d second/s.%n", Math.abs(seconds));
             }
         }
     }
 
-    private static boolean isValid(char[][] matrix, int row, int col) {
-        return row >= 0 && row < matrix.length && col >= 0 && col < matrix[row].length;
-    }
-
-    private static void printMatrix(char[][] matrix) {
-        for (char[] charts : matrix) {
-            for (char anInt : charts) {
-                System.out.print(anInt);
+    private static void printBombHasBeenPlanted(char[][] matrix) {
+        for (char[] chars : matrix) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (char aChar : chars) {
+                stringBuilder.append(aChar);
             }
-            System.out.println();
+            System.out.printf("%s%n", stringBuilder);
         }
+
     }
 }
