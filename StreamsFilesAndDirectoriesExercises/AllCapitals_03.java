@@ -5,7 +5,7 @@ import java.io.*;
 public class AllCapitals_03 {
     public static void main(String[] args) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("resources/input.txt"));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("resourcesExercise/input.txt"));
 
 
         PrintWriter printer = new PrintWriter(new FileWriter("all-capitals.txt"));

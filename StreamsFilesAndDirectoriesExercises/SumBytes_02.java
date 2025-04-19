@@ -8,7 +8,7 @@ import java.io.IOException;
 public class SumBytes_02 {
     public static void main(String[] args) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("resources/input.txt"));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("resourcesExercise/input.txt"));
 
         String line = bufferedReader.readLine();
 
