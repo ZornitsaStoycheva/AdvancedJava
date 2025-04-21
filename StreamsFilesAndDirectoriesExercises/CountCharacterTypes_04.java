@@ -11,7 +11,7 @@ import java.util.Set;
 public class CountCharacterTypes_04 {
     public static void main(String[] args) throws IOException {
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("resources/input.txt"));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("resourcesExercise/input.txt"));
 
         String line = bufferedReader.readLine();
 
@@ -24,12 +24,12 @@ public class CountCharacterTypes_04 {
             char[] characterFromLine = line.toCharArray();
 
             for (char character : characterFromLine) {
-                    if (character == 'A' || character == 'O' || character == 'I' || character == 'E' || character == 'U') {
+                    if (character == 'a' || character == 'o' || character == 'i' || character == 'e' || character == 'u') {
                         countVowels ++;
                     } else if (character == '.' || character == '?' || character == '!' || character == ',') {
                         countPunctuation ++;
-                    } else if (character != ' ') {
-                        if (Character.isUpperCase(character)) {
+                    } else  {
+                        if (character != ' ') {
                             otherSymbol ++;
                         }
                     }
